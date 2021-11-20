@@ -2,15 +2,15 @@ resource "null_resource" "install" {
   provisioner "local-exec" {
     command = <<-EOT
       aws eks --region eu-west-3 update-kubeconfig --name star-app
-      git clone https://github.com/Julianius/star-app-gitops.git || true
-      kubectl create namespace argocd || true
+      git clone https://github.com/Julianius/star-app-gitops.git
+      kubectl create namespace argocd
       kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.6.0/cert-manager.yaml
       helm install -n argocd argocd ./star-app-gitops/charts/argo-cd/
       rm -rf ./star-app-gitops/
       kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-      kubectl create namespace release || true
-      kubectl create namespace dev || true
-      kubectl create namespace stg || true
+      kubectl create namespace release
+      kubectl create namespace dev
+      kubectl create namespace stg
       sleep 80
       argocd login --insecure $(kubectl -n argocd get svc argocd-server -o json | jq -r .status.loadBalancer.ingress[0].hostname) --username admin --password $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
       argocd app create nginx-ingress --repo https://github.com/Julianius/star-app-gitops --path charts/ingress-nginx --sync-policy automatic --dest-server https://kubernetes.default.svc --dest-namespace default --values values.yaml
