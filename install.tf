@@ -11,7 +11,7 @@ resource "null_resource" "install" {
       kubectl create namespace release
       kubectl create namespace dev
       kubectl create namespace stg
-      sleep 80
+      sleep 100
       argocd login --insecure $(kubectl -n argocd get svc argocd-server -o json | jq -r .status.loadBalancer.ingress[0].hostname) --username admin --password $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
       argocd app create prometheus-grafana --repo https://github.com/Julianius/star-app-gitops --path charts/kube-prometheus-stack --sync-policy automatic --dest-server https://kubernetes.default.svc --dest-namespace default --values values.yaml
       argocd app create nginx-ingress --repo https://github.com/Julianius/star-app-gitops --path charts/ingress-nginx --sync-policy automatic --dest-server https://kubernetes.default.svc --dest-namespace default --values values.yaml --values monitoring.values.yml
