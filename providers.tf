@@ -1,3 +1,8 @@
+provider "aws" {
+  region  = var.region
+  profile = var.aws_profile
+}
+
 provider "kubernetes" {
   host                   = data.aws_eks_cluster.cluster.endpoint
   token                  = data.aws_eks_cluster_auth.cluster.token
