@@ -8,11 +8,13 @@ resource "null_resource" "install" {
       helm install -n argocd argocd ./star-app-gitops/charts/argo-cd/
       rm -rf ./star-app-gitops/
       kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+      kubectl create namespace logging
       kubectl create namespace release
       kubectl create namespace dev
       kubectl create namespace stg
       sleep 100
       argocd login --insecure $(kubectl -n argocd get svc argocd-server -o json | jq -r .status.loadBalancer.ingress[0].hostname) --username admin --password $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+      argocd app create elastic --repo https://github.com/Julianius/star-app-gitops --path charts/elasticsearch --sync-policy automatic --dest-server https://kubernetes.default.svc --dest-namespace logging --values values.yaml --values system.values.yaml
       argocd app create prometheus-grafana --repo https://github.com/Julianius/star-app-gitops --path charts/kube-prometheus-stack --sync-policy automatic --dest-server https://kubernetes.default.svc --dest-namespace default --values values.yaml
       argocd app create nginx-ingress --repo https://github.com/Julianius/star-app-gitops --path charts/ingress-nginx --sync-policy automatic --dest-server https://kubernetes.default.svc --dest-namespace default --values values.yaml --values monitoring.values.yml
       argocd app create mongodb-release --repo https://github.com/Julianius/star-app-gitops --path charts/mongodb --sync-policy automatic --dest-server https://kubernetes.default.svc --dest-namespace release --values values.yaml --values release.values.yml
