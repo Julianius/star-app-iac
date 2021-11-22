@@ -9,9 +9,7 @@ module "eks" {
   }
 
   vpc_id = module.vpc.vpc_id
-
   workers_group_defaults = var.workers_group_defaults
-
   worker_groups = [
     {
       name                          = var.eks_worker_groups[0].name
@@ -20,13 +18,6 @@ module "eks" {
       asg_desired_capacity          = var.eks_worker_groups[0].asg_desired_capacity
       additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
     },
-    {
-      name                          = var.eks_worker_groups[1].name
-      instance_type                 = var.eks_worker_groups[1].instance_type
-      additional_userdata           = var.eks_worker_groups[1].additional_userdata
-      asg_desired_capacity          = var.eks_worker_groups[1].asg_desired_capacity
-      additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
-    }
   ] 
 }
 

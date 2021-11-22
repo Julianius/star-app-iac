@@ -37,19 +37,19 @@ variable "vpc_public_subnets" {
 
 variable "vpc_enable_nat_gateway" {
   type        = bool
-  description = "Enable nat gateway."
+  description = "Should be true if you want to provision NAT Gateways for each of your private networks"
   default     = true
 }
 
 variable "vpc_single_nat_gateway" {
   type        = bool
-  description = "Single nat gateway."
+  description = "Should be true if you want to provision a single shared NAT Gateway across all of your private networks"
   default     = true
 }
 
 variable "vpc_enable_dns_hostnames" {
   type        = bool
-  description = "Enable dns hostnames."
+  description = "Should be true to enable DNS hostnames in the VPC."
   default     = true
 }
 
@@ -206,7 +206,7 @@ variable "eks_worker_groups" {
   }))
   default = [{
     name                          = "worker-group-1"
-    instance_type                 = "t2.small"
+    instance_type                 = "t2.large"
     additional_userdata           = "Star app worker group one."
     asg_desired_capacity          = 3
     additional_security_group_ids = []
